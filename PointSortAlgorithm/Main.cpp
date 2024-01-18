@@ -11,18 +11,21 @@
 #include <thread>
 //#include <stdfloat> //C++23 only
 
-//Boost
+//Boost Library (may not work without the correct project settings)
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
+//Global variables
 constexpr auto DEBUG_MODE = true;
 using pFloat = boost::multiprecision::cpp_dec_float_100;
 
+//Print a singel std::pair to console
 template <typename  T>
 static void printPair(std::pair<T, T>& pair)
 {
 	std::cout << std::setprecision(8) << pair.first << " " << pair.second << std::endl;
 }
 
+//print an entire vector of std::pairs to console
 template <typename  T>
 static void printPointPairs(std::vector<std::pair<T, T>>& pointPairs)
 {
@@ -30,6 +33,7 @@ static void printPointPairs(std::vector<std::pair<T, T>>& pointPairs)
 		printPair(pair);
 }
 
+//write a vector of std::pair to a file
 template <typename T>
 static void writeToFile(const std::string& filepath, std::vector<std::pair<T, T>>& pointPairs)
 {
@@ -54,7 +58,7 @@ static void writeToFile(const std::string& filepath, std::vector<std::pair<T, T>
 	std::cout << "Saved results to " << filepath << "..." << std::endl;
 }
 
-
+//Read in values from a file
 static std::vector<std::pair<pFloat, pFloat>> inputValues(const std::string& filepath)
 {
 	std::ifstream inputFile{ filepath };
@@ -87,6 +91,7 @@ static std::vector<std::pair<pFloat, pFloat>> inputValues(const std::string& fil
 	return pointPairs;
 }
 
+//Sort the vector of std::pair
 template<typename T>
 static std::vector<std::pair<T, T>> sortList(std::vector<std::pair<T, T>>& in)
 {
@@ -112,6 +117,7 @@ static std::vector<std::pair<T, T>> sortList(std::vector<std::pair<T, T>>& in)
 	return pos;
 }
 
+//find the greatest value across every std::pair
 template<typename T>
 static const T findGreatest(std::vector<std::pair<T, T>>& in)
 {
@@ -129,6 +135,7 @@ static const T findGreatest(std::vector<std::pair<T, T>>& in)
 	return greatest;
 }
 
+//Generalize all values 
 template<typename T>
 static std::vector<std::pair<T, T>> generalize(std::vector<std::pair<T, T>> in)
 {
