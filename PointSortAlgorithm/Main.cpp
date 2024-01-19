@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "Application.h"
 
+//Hide Console in the background when running release build.
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+
 int main()
 {
 	Application app;

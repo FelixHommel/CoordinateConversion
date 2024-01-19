@@ -9,7 +9,11 @@ public:
 	~Conversion();
 
 	//Public functions
-	void calculate(const std::string& inputFilepath = "", const std::string& outputFilepath = "data/out.dat");
+	void calculate(const std::string& inputFilepath = "");
+	void saveToFile(const std::string& outputFilepath ="data/out.dat");
+
+	//Accessors
+	inline const pointPairs& getPointPairs() const { return m_pointPairs; }
 
 private:
 	//Private members
@@ -28,7 +32,6 @@ private:
 	pFloat findGreatest();
 	pointPairs generalize();
 
-	void saveToFile(const std::string& outputFilepath);
 };
 
 #endif // !CONVERSION_H

@@ -17,12 +17,37 @@ Conversion::~Conversion()
 /// </summary>
 /// <param name="inputFilepath">const std::string : location of the input file</param>
 /// <param name="outputFilepath">const std::string : location of the output file</param>
-void Conversion::calculate(const std::string& inputFilepath, const std::string& outputFilepath)
+void Conversion::calculate(const std::string& inputFilepath)
 {
 	m_pointPairs = readPairs(inputFilepath);
 	m_pointPairs = sortPairs();
 	m_pointPairs = generalize();
-	saveToFile(outputFilepath);
+}
+
+/// <summary>
+/// Save the final pairs to the output file
+/// </summary>
+/// <param name="outputFilepath">const std::string : output file location</param>
+void Conversion::saveToFile(const std::string& outputFilepath)
+{
+	std::ofstream outputFile{ outputFilepath };
+
+	
+	if (!outputFile.is_open())
+	{
+		std::cerr << "Failed saving the results to a File. Please try again..." << std::endl;
+	}
+	
+
+	outputFile << std::fixed<< std::setprecision(8) << std::endl;
+
+	for (const std::pair<pFloat, pFloat>& pair : m_pointPairs)
+	{
+		outputFile << pair.first << " " << pair.second << std::endl;
+	}
+
+	outputFile.close();
+	std::cout << "Saved results to " << outputFilepath << "..." << std::endl;
 }
 
 /// <summary>
@@ -139,7 +164,7 @@ pFloat Conversion::findGreatest()
 /// <returns>Generalized pairs</returns>
 pointPairs Conversion::generalize()
 {
-	pFloat divisor{ findGreatest() };
+	pFloat divisor{ m_pointPairs.at(0).first};
 
 	pointPairs result{ m_pointPairs };
 
@@ -154,28 +179,4 @@ pointPairs Conversion::generalize()
 	}
 
 	return result;
-}
-
-/// <summary>
-/// Save the final pairs to the output file
-/// </summary>
-/// <param name="outputFilepath">const std::string : output file location</param>
-void Conversion::saveToFile(const std::string& outputFilepath)
-{
-	std::ofstream outputFile{ outputFilepath };
-
-	if (!outputFile.is_open())
-	{
-		std::cerr << "Failed saving the results to a File. Please try again..." << std::endl;
-	}
-
-	outputFile << std::setprecision(8) << std::endl;
-
-	for (const std::pair<pFloat, pFloat>& pair : m_pointPairs)
-	{
-		outputFile << pair.first << " " << pair.second << std::endl;
-	}
-
-	outputFile.close();
-	std::cout << "Saved results to " << outputFilepath << "..." << std::endl;
 }

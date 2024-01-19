@@ -10,6 +10,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iomanip>
+#include <filesystem>
 
 //Boost Library (may not work without the correct project settings)
 #include <boost/multiprecision/cpp_dec_float.hpp>
@@ -23,6 +24,7 @@
 
 //TGUI Library
 #include <TGUI/TGUI.hpp>
+#include <TGUI/AllWidgets.hpp>
 
 //GLOBAL Files
 #include "GLOBAL.h"
