@@ -2,6 +2,7 @@
 #define APPLICATION_H
 
 #include "Conversion.h"
+#include "Plotter.h"
 
 class Application
 {
@@ -17,6 +18,9 @@ private:
 	//Private members
 	sf::RenderWindow* m_window;
 	Conversion m_converter;
+	Plotter* m_plot;
+
+	pointPairs m_points;
 
 	//GUI elements
 	tgui::Gui m_gui;
@@ -58,6 +62,9 @@ private:
 	void masterEventHandler(tgui::Gui& gui);
 	void masterUpdate();
 	void masterRender(sf::RenderTarget& target, tgui::Gui& gui);
+
+	//
+	void displayPreview(tgui::TextArea::Ptr& previewArea);
 };
 
 #endif // !APPLICATION_H

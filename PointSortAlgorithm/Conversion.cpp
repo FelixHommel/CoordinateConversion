@@ -17,11 +17,13 @@ Conversion::~Conversion()
 /// </summary>
 /// <param name="inputFilepath">const std::string : location of the input file</param>
 /// <param name="outputFilepath">const std::string : location of the output file</param>
-void Conversion::calculate(const std::string& inputFilepath)
+pointPairs Conversion::calculate(const std::string& inputFilepath)
 {
 	m_pointPairs = readPairs(inputFilepath);
 	m_pointPairs = sortPairs();
 	m_pointPairs = generalize();
+
+	return m_pointPairs;
 }
 
 /// <summary>

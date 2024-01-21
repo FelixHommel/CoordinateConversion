@@ -4,13 +4,15 @@
 //Constructor
 Application::Application()
 {
-	m_window = new sf::RenderWindow{ sf::VideoMode{800, 600}, "Coordinate Conversion", sf::Style::Titlebar | sf::Style::Close };
+	m_window = new sf::RenderWindow{ sf::VideoMode{static_cast<unsigned int>(800 * C_SCALE_FACTOR), static_cast<unsigned int>(600 * C_SCALE_FACTOR)}, "Coordinate Conversion", sf::Style::Titlebar | sf::Style::Close };
 	initGUI(m_menuBar, m_inputFilePath, m_outputFilePath, m_buttonFile, m_buttonCalc, m_buttonSelect, m_buttonSave, m_fileDialog, m_saveFileDialog, m_labelError, m_textAreaPreview, m_checkPreview);
+	m_plot = new Plotter{ 320, 210, static_cast<unsigned int>(470 * C_SCALE_FACTOR), static_cast<unsigned int>(280 * C_SCALE_FACTOR), &m_points };
 }
 
 //Destructor
 Application::~Application()
 {
+	delete m_plot;
 	delete m_window;
 }
 
@@ -53,13 +55,13 @@ void Application::initGUI(
 		}
 	);
 	menuBar->connectMenuItem("File", "Exit", [&]() { m_window->close(); });
-	menuBar->connectMenuItem("Edit", "Calculate", [&]() { m_converter.calculate(m_openFilePath); });
+	menuBar->connectMenuItem("Edit", "Calculate", [&]() { m_points = m_converter.calculate(m_openFilePath); });
 	m_gui.add(menuBar);
 
 	// Create TGUI inputFilePath textField
 	inputFilePath = tgui::EditBox::create();
-	inputFilePath->setPosition(110, 30);
-	inputFilePath->setSize(680, 22);
+	inputFilePath->setPosition(110 * C_SCALE_FACTOR, 30 * C_SCALE_FACTOR);
+	inputFilePath->setSize(680 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
 	inputFilePath->setTextSize(13);
 	inputFilePath->setDefaultText("Input filepath...");
 	inputFilePath->setReadOnly(true);
@@ -68,8 +70,8 @@ void Application::initGUI(
 
 	// Create TGUI outputFilePath textField
 	outputFilePath = tgui::EditBox::create();
-	outputFilePath->setPosition(210, 90);
-	outputFilePath->setSize(580, 22);
+	outputFilePath->setPosition(210 * C_SCALE_FACTOR, 90 * C_SCALE_FACTOR);
+	outputFilePath->setSize(580 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
 	outputFilePath->setTextSize(13);
 	outputFilePath->setDefaultText("Output filepath...");
 	outputFilePath->setReadOnly(true);
@@ -78,8 +80,8 @@ void Application::initGUI(
 
 	// Create Button for file selection
 	buttonFile = tgui::Button::create();
-	buttonFile->setPosition(10, 30);
-	buttonFile->setSize(90, 22);
+	buttonFile->setPosition(10 * C_SCALE_FACTOR, 30 * C_SCALE_FACTOR);
+	buttonFile->setSize(90 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
 	buttonFile->setTextSize(13);
 	buttonFile->setText("Select File");
 
@@ -93,17 +95,26 @@ void Application::initGUI(
 
 	// Create a button to calculate the results
 	buttonCalc = tgui::Button::create();
-	buttonCalc->setPosition(10, 60);
-	buttonCalc->setSize(90, 22);
+	buttonCalc->setPosition(10 * C_SCALE_FACTOR, 60 * C_SCALE_FACTOR);
+	buttonCalc->setSize(90 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
 	buttonCalc->setTextSize(13);
 	buttonCalc->setText("Calculate!");
-	buttonCalc->onPress([&]() {m_converter.calculate(m_openFilePath); });
+
+	buttonCalc->onPress([&]()
+		{
+			m_points = m_converter.calculate(m_openFilePath);
+			labelError->setText("Calucalting done.");
+			m_plot->printCoordinates();
+			//displayPreview(textAreaPreview);
+		}
+	);
+
 	m_gui.add(buttonCalc);
 
 	// Create a button to calculate the results
 	buttonSelect = tgui::Button::create();
-	buttonSelect->setPosition(110, 90);
-	buttonSelect->setSize(90, 22);
+	buttonSelect->setPosition(110 * C_SCALE_FACTOR, 90 * C_SCALE_FACTOR);
+	buttonSelect->setSize(90 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
 	buttonSelect->setTextSize(13);
 	buttonSelect->setText("Select");
 
@@ -116,13 +127,13 @@ void Application::initGUI(
 
 	// Create a button to save the converted pairs
 	buttonSave = tgui::Button::create();
-	buttonSave->setPosition(10, 90);
-	buttonSave->setSize(90, 22);
+	buttonSave->setPosition(10 * C_SCALE_FACTOR, 90 * C_SCALE_FACTOR);
+	buttonSave->setSize(90 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
 	buttonSave->setTextSize(13);
 	buttonSave->setText("Save");
 
 	buttonSave->onPress([&]() {
-		m_converter.saveToFile(m_outFilePath); }
+		m_converter.saveToFile(m_outFilePath); labelError->setText("Saved to output file"); }
 	);
 
 	m_gui.add(buttonSave);
@@ -157,19 +168,18 @@ void Application::initGUI(
 
 	//label
 	labelError = tgui::Label::create();
-	labelError->setPosition(220, 60);
-	labelError->setSize(570, 22);
+	labelError->setPosition(220 * C_SCALE_FACTOR, 60 * C_SCALE_FACTOR);
+	labelError->setSize(570 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
 	labelError->setTextSize(13);
-	labelError->setText("Error");
+	labelError->setText("");
 	labelError->setScrollbarPolicy(tgui::Scrollbar::Policy::Never);
 	labelError->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
-	labelError->setVisible(false);
 	m_gui.add(labelError);
 
 	//textarea
 	textAreaPreview = tgui::TextArea::create();
-	textAreaPreview->setPosition(10, 120);
-	textAreaPreview->setSize(298, 465);
+	textAreaPreview->setPosition(10 * C_SCALE_FACTOR, 120 * C_SCALE_FACTOR);
+	textAreaPreview->setSize(298 * C_SCALE_FACTOR, 465 * C_SCALE_FACTOR);
 	textAreaPreview->setTextSize(13);
 	textAreaPreview->setDefaultText("Preview");
 	textAreaPreview->setHorizontalScrollbarPolicy(tgui::Scrollbar::Policy::Never);
@@ -178,8 +188,8 @@ void Application::initGUI(
 
 	//checkBox
 	checkPreview = tgui::CheckBox::create();
-	checkPreview->setPosition(110, 60);
-	checkPreview->setSize(22, 22);
+	checkPreview->setPosition(110 * C_SCALE_FACTOR, 60 * C_SCALE_FACTOR);
+	checkPreview->setSize(22 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
 	checkPreview->setTextSize(13);
 	checkPreview->setText("Preview?");
 	checkPreview->setTextClickable(false);
@@ -234,8 +244,21 @@ void Application::masterRender(sf::RenderTarget& target, tgui::Gui& gui)
 
 	gui.setTarget(target);
 	gui.draw();
+	m_plot->render(target);
 
 	m_window->display();
+}
+
+void Application::displayPreview(tgui::TextArea::Ptr& previewArea)
+{
+	//BUGGED, DO NOT USE
+	previewArea->setText('\n');
+	for (size_t i{ 0 }; i < m_points.size(); ++i)
+	{
+		previewArea->addText(m_points.at(i).first.str());
+		previewArea->addText(" | ");
+		previewArea->addText(m_points.at(i).second.str());
+	}
 }
 
 /// <summary>

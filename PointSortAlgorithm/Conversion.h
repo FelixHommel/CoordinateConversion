@@ -9,11 +9,8 @@ public:
 	~Conversion();
 
 	//Public functions
-	void calculate(const std::string& inputFilepath = "");
+	pointPairs calculate(const std::string& inputFilepath = "");
 	void saveToFile(const std::string& outputFilepath ="data/out.dat");
-
-	//Accessors
-	inline const pointPairs& getPointPairs() const { return m_pointPairs; }
 
 private:
 	//Private members
