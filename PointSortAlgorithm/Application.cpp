@@ -4,15 +4,17 @@
 //Constructor
 Application::Application()
 {
-	m_window = new sf::RenderWindow{ sf::VideoMode{static_cast<unsigned int>(800 * C_SCALE_FACTOR), static_cast<unsigned int>(600 * C_SCALE_FACTOR)}, "Coordinate Conversion", sf::Style::Titlebar | sf::Style::Close };
+	m_window = new sf::RenderWindow{ sf::VideoMode::getDesktopMode(), "Coordinate Conversion", sf::Style::None };
+	m_view = new sf::View{ sf::FloatRect{0,0,800,600} };
 	initGUI(m_menuBar, m_inputFilePath, m_outputFilePath, m_buttonFile, m_buttonCalc, m_buttonSelect, m_buttonSave, m_fileDialog, m_saveFileDialog, m_labelError, m_textAreaPreview, m_checkPreview);
-	m_plot = new Plotter{ 320, 210, static_cast<unsigned int>(470 * C_SCALE_FACTOR), static_cast<unsigned int>(280 * C_SCALE_FACTOR), &m_points };
+	//m_plot = new Plotter{ 320, 210, static_cast<unsigned int>(470 * C_SCALE_FACTOR), static_cast<unsigned int>(280 * C_SCALE_FACTOR), &m_points };
 }
 
 //Destructor
 Application::~Application()
 {
-	delete m_plot;
+	//delete m_plot;
+	delete m_view;
 	delete m_window;
 }
 
@@ -35,6 +37,8 @@ void Application::initGUI(
 	, tgui::TextArea::Ptr& textAreaPreview
 	, tgui::CheckBox::Ptr& checkPreview)
 {
+	const sf::VideoMode vm{ m_window->getSize().x, m_window->getSize().y };
+
 	//Menu Bar
 	menuBar = tgui::MenuBar::create();
 	menuBar->addMenu("File");
@@ -60,9 +64,9 @@ void Application::initGUI(
 
 	// Create TGUI inputFilePath textField
 	inputFilePath = tgui::EditBox::create();
-	inputFilePath->setPosition(110 * C_SCALE_FACTOR, 30 * C_SCALE_FACTOR);
-	inputFilePath->setSize(680 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
-	inputFilePath->setTextSize(13);
+	inputFilePath->setPosition(percentagePosX(vm, 10.f), percentagePosY(vm, 2.5f));
+	inputFilePath->setSize(percentageSizeWidth(vm, 88.f), percentageSizeHeight(vm, 3.f));
+	inputFilePath->setTextSize(calculateCharSize(vm, 100));
 	inputFilePath->setDefaultText("Input filepath...");
 	inputFilePath->setReadOnly(true);
 	inputFilePath->setEnabled(false);
@@ -70,9 +74,9 @@ void Application::initGUI(
 
 	// Create TGUI outputFilePath textField
 	outputFilePath = tgui::EditBox::create();
-	outputFilePath->setPosition(210 * C_SCALE_FACTOR, 90 * C_SCALE_FACTOR);
-	outputFilePath->setSize(580 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
-	outputFilePath->setTextSize(13);
+	outputFilePath->setPosition(percentagePosX(vm, 19.f), percentagePosY(vm, 10.5f));
+	outputFilePath->setSize(percentageSizeWidth(vm, 79.f), percentageSizeHeight(vm, 3.f));
+	outputFilePath->setTextSize(calculateCharSize(vm, 100));
 	outputFilePath->setDefaultText("Output filepath...");
 	outputFilePath->setReadOnly(true);
 	outputFilePath->setEnabled(false);
@@ -80,9 +84,9 @@ void Application::initGUI(
 
 	// Create Button for file selection
 	buttonFile = tgui::Button::create();
-	buttonFile->setPosition(10 * C_SCALE_FACTOR, 30 * C_SCALE_FACTOR);
-	buttonFile->setSize(90 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
-	buttonFile->setTextSize(13);
+	buttonFile->setPosition(percentagePosX(vm, 1.f), percentagePosY(vm, 2.5f));
+	buttonFile->setSize(percentageSizeWidth(vm, 8.f), percentageSizeHeight(vm, 3.f));
+	buttonFile->setTextSize(calculateCharSize(vm, 120));
 	buttonFile->setText("Select File");
 
 	buttonFile->onPress([&]() {
@@ -95,10 +99,10 @@ void Application::initGUI(
 
 	// Create a button to calculate the results
 	buttonCalc = tgui::Button::create();
-	buttonCalc->setPosition(10 * C_SCALE_FACTOR, 60 * C_SCALE_FACTOR);
-	buttonCalc->setSize(90 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
-	buttonCalc->setTextSize(13);
-	buttonCalc->setText("Calculate!");
+	buttonCalc->setPosition(percentagePosX(vm, 1.f), percentagePosY(vm, 6.5f));
+	buttonCalc->setSize(percentageSizeWidth(vm, 8.f), percentageSizeHeight(vm, 3.f));
+	buttonCalc->setTextSize(calculateCharSize(vm, 100));
+	buttonCalc->setText("Calculate");
 
 	buttonCalc->onPress([&]()
 		{
@@ -113,9 +117,9 @@ void Application::initGUI(
 
 	// Create a button to calculate the results
 	buttonSelect = tgui::Button::create();
-	buttonSelect->setPosition(110 * C_SCALE_FACTOR, 90 * C_SCALE_FACTOR);
-	buttonSelect->setSize(90 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
-	buttonSelect->setTextSize(13);
+	buttonSelect->setPosition(percentagePosX(vm, 10.f), percentagePosY(vm, 10.5f));
+	buttonSelect->setSize(percentageSizeWidth(vm, 8.f), percentageSizeHeight(vm, 3.f));
+	buttonSelect->setTextSize(calculateCharSize(vm, 100));
 	buttonSelect->setText("Select");
 
 	buttonSelect->onPress([&]() {
@@ -127,9 +131,9 @@ void Application::initGUI(
 
 	// Create a button to save the converted pairs
 	buttonSave = tgui::Button::create();
-	buttonSave->setPosition(10 * C_SCALE_FACTOR, 90 * C_SCALE_FACTOR);
-	buttonSave->setSize(90 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
-	buttonSave->setTextSize(13);
+	buttonSave->setPosition(percentagePosX(vm, 1.f), percentagePosY(vm, 10.5f));
+	buttonSave->setSize(percentageSizeWidth(vm, 8.f), percentageSizeHeight(vm, 3.f));
+	buttonSave->setTextSize(calculateCharSize(vm, 100));
 	buttonSave->setText("Save");
 
 	buttonSave->onPress([&]() {
@@ -140,7 +144,9 @@ void Application::initGUI(
 
 	//File Dialog
 	fileDialog = tgui::FileDialog::create();
-	fileDialog->setPosition(0, 0);
+	fileDialog->setPosition(0.f, 0.f);
+	fileDialog->setSize(percentageSizeWidth(vm, 80.f), percentageSizeHeight(vm, 75.f));
+	fileDialog->setTextSize(calculateCharSize(vm, 150));
 	fileDialog->setEnabled(false);
 	fileDialog->setVisible(false);
 
@@ -155,6 +161,8 @@ void Application::initGUI(
 	//Save file Dialog
 	saveFileDialog = tgui::FileDialog::create();
 	saveFileDialog->setPosition(0, 0);
+	saveFileDialog->setSize(percentageSizeWidth(vm, 400), percentageSizeHeight(vm, 200));
+	saveFileDialog->setTextSize(calculateCharSize(vm, 150));
 	saveFileDialog->setEnabled(false);
 	saveFileDialog->setVisible(false);
 
@@ -168,9 +176,9 @@ void Application::initGUI(
 
 	//label
 	labelError = tgui::Label::create();
-	labelError->setPosition(220 * C_SCALE_FACTOR, 60 * C_SCALE_FACTOR);
-	labelError->setSize(570 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
-	labelError->setTextSize(13);
+	labelError->setPosition(percentagePosX(vm, 220), percentagePosY(vm, 60));
+	labelError->setSize(percentageSizeWidth(vm, 570), percentageSizeHeight(vm, 22));
+	labelError->setTextSize(calculateCharSize(vm, 60));
 	labelError->setText("");
 	labelError->setScrollbarPolicy(tgui::Scrollbar::Policy::Never);
 	labelError->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
@@ -178,9 +186,9 @@ void Application::initGUI(
 
 	//textarea
 	textAreaPreview = tgui::TextArea::create();
-	textAreaPreview->setPosition(10 * C_SCALE_FACTOR, 120 * C_SCALE_FACTOR);
-	textAreaPreview->setSize(298 * C_SCALE_FACTOR, 465 * C_SCALE_FACTOR);
-	textAreaPreview->setTextSize(13);
+	textAreaPreview->setPosition(percentagePosX(vm, 10), percentagePosY(vm, 120));
+	textAreaPreview->setSize(percentageSizeWidth(vm, 298), percentageSizeHeight(vm, 465));
+	textAreaPreview->setTextSize(calculateCharSize(vm, 60));
 	textAreaPreview->setDefaultText("Preview");
 	textAreaPreview->setHorizontalScrollbarPolicy(tgui::Scrollbar::Policy::Never);
 	textAreaPreview->setReadOnly(true);
@@ -188,9 +196,9 @@ void Application::initGUI(
 
 	//checkBox
 	checkPreview = tgui::CheckBox::create();
-	checkPreview->setPosition(110 * C_SCALE_FACTOR, 60 * C_SCALE_FACTOR);
-	checkPreview->setSize(22 * C_SCALE_FACTOR, 22 * C_SCALE_FACTOR);
-	checkPreview->setTextSize(13);
+	checkPreview->setPosition(percentagePosX(vm, 110), percentagePosY(vm, 60));
+	checkPreview->setSize(percentageSizeWidth(vm, 22), percentageSizeHeight(vm, 22));
+	checkPreview->setTextSize(calculateCharSize(vm, 60));
 	checkPreview->setText("Preview?");
 	checkPreview->setTextClickable(false);
 	checkPreview->setChecked(true);
@@ -213,6 +221,10 @@ void Application::masterEventHandler(tgui::Gui& gui)
 		{
 		case sf::Event::Closed:
 			m_window->close();
+			break;
+		case sf::Event::Resized:
+			m_view->setSize(static_cast<float>(m_window->getSize().x), static_cast<float>(m_window->getSize().y));
+			m_window->setView(*m_view);
 			break;
 		case sf::Event::KeyPressed:
 			switch (ev.key.code)
@@ -244,7 +256,7 @@ void Application::masterRender(sf::RenderTarget& target, tgui::Gui& gui)
 
 	gui.setTarget(target);
 	gui.draw();
-	m_plot->render(target);
+	//m_plot->render(target);
 
 	m_window->display();
 }

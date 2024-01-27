@@ -5,7 +5,7 @@
 constexpr auto DEBUG_MODE = false;
 
 //Global constants
-constexpr auto C_SCALE_FACTOR = 1.5f;
+constexpr auto C_SCALE_FACTOR = 1.f;
 
 //Typealiases
 using pFloat = boost::multiprecision::cpp_dec_float_100;
