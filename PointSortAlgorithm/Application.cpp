@@ -47,6 +47,7 @@ void Application::initGUI(
 	menuBar->addMenuItem("Exit");
 	menuBar->addMenu("Edit");
 	menuBar->addMenuItem("Calculate");
+	menuBar->setSize(percentageSizeWidth(vm, 100.f), percentageSizeHeight(vm, 2.f));
 
 	menuBar->connectMenuItem("File", "Load", [&]() {
 		fileDialog->setEnabled(true);
@@ -146,9 +147,10 @@ void Application::initGUI(
 	fileDialog = tgui::FileDialog::create();
 	fileDialog->setPosition(0.f, 0.f);
 	fileDialog->setSize(percentageSizeWidth(vm, 80.f), percentageSizeHeight(vm, 75.f));
-	fileDialog->setTextSize(calculateCharSize(vm, 150));
+	fileDialog->setTextSize(calculateCharSize(vm, 130));
 	fileDialog->setEnabled(false);
 	fileDialog->setVisible(false);
+	fileDialog->setMultiSelect(false);
 
 	fileDialog->onFileSelect([&]() {
 		m_openFilePath = fileDialog->getSelectedPaths()[0].asString().toStdString();
@@ -162,7 +164,7 @@ void Application::initGUI(
 	saveFileDialog = tgui::FileDialog::create();
 	saveFileDialog->setPosition(0, 0);
 	saveFileDialog->setSize(percentageSizeWidth(vm, 400), percentageSizeHeight(vm, 200));
-	saveFileDialog->setTextSize(calculateCharSize(vm, 150));
+	saveFileDialog->setTextSize(calculateCharSize(vm, 130));
 	saveFileDialog->setEnabled(false);
 	saveFileDialog->setVisible(false);
 
