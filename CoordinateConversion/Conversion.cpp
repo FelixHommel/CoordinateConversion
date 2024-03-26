@@ -20,8 +20,8 @@ Conversion::~Conversion()
 pointPairs Conversion::calculate(const std::string& inputFilepath)
 {
 	m_pointPairs = readPairs(inputFilepath);
-	m_pointPairs = sortPairs();
-	m_pointPairs = generalize();
+	sortPairs(m_pointPairs);
+	normalize(m_pointPairs);
 
 	return m_pointPairs;
 }
@@ -113,7 +113,7 @@ pointPairs Conversion::readPairs(const std::string& inputFilepath)
 /// Sort the pairs
 /// </summary>
 /// <returns>Sorted pairs</returns>
-pointPairs Conversion::sortPairs()
+void Conversion::sortPairs(pointPairs& pairs)
 {
 	pointPairs positive;
 	pointPairs negative;
@@ -134,7 +134,7 @@ pointPairs Conversion::sortPairs()
 		positive.push_back(negative.at(i));
 	}
 
-	return positive;
+	pairs = positive;
 }
 
 /// <summary>
@@ -164,7 +164,7 @@ pFloat Conversion::findGreatest()
 /// Generalize the points to bring them all in a relative distance to each other.
 /// </summary>
 /// <returns>Generalized pairs</returns>
-pointPairs Conversion::generalize()
+void Conversion::normalize(pointPairs& pairs)
 {
 	pFloat divisor{ m_pointPairs.at(0).first};
 
@@ -180,5 +180,5 @@ pointPairs Conversion::generalize()
 		result.at(i) = p;
 	}
 
-	return result;
+	pairs = result;
 }

@@ -24,10 +24,10 @@ private:
 
 	pointPairs readPairs(const std::string& inputFilepath);
 
-	pointPairs sortPairs();
+	void sortPairs(pointPairs& pairs);
 
-	pFloat findGreatest();
-	pointPairs generalize();
+	pointPairs findGreatest();
+	void normalize(pointPairs& pairs);
 
 };
 
