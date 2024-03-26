@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "Application.h"
+#include "../stdafx.h"
+#include "../include/Application.h"
 
 //Constructor
 Application::Application()

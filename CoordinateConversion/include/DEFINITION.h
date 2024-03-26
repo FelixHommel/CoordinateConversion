@@ -1,6 +1,9 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+//Boost Library (may not work without the correct project settings)
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
 //Global variables
 constexpr auto DEBUG_MODE = true;
 

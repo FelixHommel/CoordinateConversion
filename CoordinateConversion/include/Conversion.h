@@ -26,7 +26,7 @@ private:
 
 	void sortPairs(pointPairs& pairs);
 
-	pointPairs findGreatest();
+	pFloat findGreatest();
 	void normalize(pointPairs& pairs);
 
 };

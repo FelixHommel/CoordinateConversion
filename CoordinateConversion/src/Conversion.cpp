@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "Conversion.h"
+#include "../stdafx.h"
+#include "../include/Conversion.h"
 
 //Constructor
 Conversion::Conversion()

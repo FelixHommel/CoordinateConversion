@@ -1,5 +1,5 @@
-#include "stdafx.h"
-#include "Plotter.h"
+#include "../stdafx.h"
+#include "../include/Plotter.h"
 
 Plotter::Plotter(sf::RenderWindow* window, pointPairs* points)
 	: m_coordinates{ points }

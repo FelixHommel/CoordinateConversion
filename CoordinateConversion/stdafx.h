@@ -12,9 +12,6 @@
 #include <iomanip>
 #include <filesystem>
 
-//Boost Library (may not work without the correct project settings)
-#include <boost/multiprecision/cpp_dec_float.hpp>
-
 //SFML Library
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -27,7 +24,7 @@
 #include <TGUI/AllWidgets.hpp>
 
 //GLOBAL Files
-#include "GLOBAL.h"
+#include "include/DEFINITION.h"
 
 class stdafx
 {
