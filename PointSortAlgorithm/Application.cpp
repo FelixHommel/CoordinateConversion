@@ -5,16 +5,14 @@
 Application::Application()
 {
 	m_window = new sf::RenderWindow{ sf::VideoMode::getDesktopMode(), "Coordinate Conversion", sf::Style::None };
-	m_view = new sf::View{ sf::FloatRect{0,0,800,600} };
-	initGUI(m_menuBar, m_inputFilePath, m_outputFilePath, m_buttonFile, m_buttonCalc, m_buttonSelect, m_buttonSave, m_fileDialog, m_saveFileDialog, m_labelError, m_textAreaPreview, m_checkPreview);
-	//m_plot = new Plotter{ 320, 210, static_cast<unsigned int>(470 * C_SCALE_FACTOR), static_cast<unsigned int>(280 * C_SCALE_FACTOR), &m_points };
+	initGUI(m_menuBar, m_inputFilePath, m_outputFilePath, m_buttonFile, m_buttonCalc, m_buttonSelect, m_buttonSave, m_buttonPlot, m_fileDialog, m_saveFileDialog, m_labelError, m_textAreaPreview, m_checkPreview);
 }
 
 //Destructor
 Application::~Application()
 {
 	//delete m_plot;
-	delete m_view;
+	delete m_plotWindow;
 	delete m_window;
 }
 
@@ -31,6 +29,7 @@ void Application::initGUI(
 	, tgui::Button::Ptr& buttonCalc
 	, tgui::Button::Ptr& buttonSelect
 	, tgui::Button::Ptr& buttonSave
+	, tgui::Button::Ptr& buttonPlot
 	, tgui::FileDialog::Ptr& fileDialog
 	, tgui::FileDialog::Ptr& saveFileDialog
 	, tgui::Label::Ptr& labelError
@@ -49,14 +48,16 @@ void Application::initGUI(
 	menuBar->addMenuItem("Calculate");
 	menuBar->setSize(percentageSizeWidth(vm, 100.f), percentageSizeHeight(vm, 2.f));
 
-	menuBar->connectMenuItem("File", "Load", [&]() {
-		fileDialog->setEnabled(true);
-		fileDialog->setVisible(true);
+	menuBar->connectMenuItem("File", "Load", [&]()
+		{
+			fileDialog->setEnabled(true);
+			fileDialog->setVisible(true);
 		}
 	);
-	menuBar->connectMenuItem("File", "Save", [&]() {
-		saveFileDialog->setEnabled(true);
-		saveFileDialog->setVisible(true);
+	menuBar->connectMenuItem("File", "Save", [&]()
+		{
+			saveFileDialog->setEnabled(true);
+			saveFileDialog->setVisible(true);
 		}
 	);
 	menuBar->connectMenuItem("File", "Exit", [&]() { m_window->close(); });
@@ -90,9 +91,10 @@ void Application::initGUI(
 	buttonFile->setTextSize(calculateCharSize(vm, 120));
 	buttonFile->setText("Select File");
 
-	buttonFile->onPress([&]() {
-		fileDialog->setEnabled(true);
-		fileDialog->setVisible(true);
+	buttonFile->onPress([&]()
+		{
+			fileDialog->setEnabled(true);
+			fileDialog->setVisible(true);
 		}
 	);
 
@@ -109,7 +111,6 @@ void Application::initGUI(
 		{
 			m_points = m_converter.calculate(m_openFilePath);
 			labelError->setText("Calucalting done.");
-			m_plot->printCoordinates();
 			//displayPreview(textAreaPreview);
 		}
 	);
@@ -123,9 +124,11 @@ void Application::initGUI(
 	buttonSelect->setTextSize(calculateCharSize(vm, 100));
 	buttonSelect->setText("Select");
 
-	buttonSelect->onPress([&]() {
-		saveFileDialog->setEnabled(true);
-		saveFileDialog->setVisible(true); }
+	buttonSelect->onPress([&]()
+		{
+			saveFileDialog->setEnabled(true);
+			saveFileDialog->setVisible(true);
+		}
 	);
 
 	m_gui.add(buttonSelect);
@@ -137,11 +140,30 @@ void Application::initGUI(
 	buttonSave->setTextSize(calculateCharSize(vm, 100));
 	buttonSave->setText("Save");
 
-	buttonSave->onPress([&]() {
-		m_converter.saveToFile(m_outFilePath); labelError->setText("Saved to output file"); }
+	buttonSave->onPress([&]()
+		{
+			m_converter.saveToFile(m_outFilePath); labelError->setText("Saved to output file");
+		}
 	);
 
 	m_gui.add(buttonSave);
+
+	// Create a button to show the plot for the result
+	buttonPlot = tgui::Button::create();
+	buttonPlot->setPosition(percentagePosX(vm, 1.f), percentagePosY(vm, 14.5f));
+	buttonPlot->setSize(percentageSizeWidth(vm, 8.f), percentageSizeHeight(vm, 3.f));
+	buttonPlot->setTextSize(calculateCharSize(vm, 100));
+	buttonPlot->setText("Plot");
+
+	buttonPlot->onPress([&]()
+		{
+			m_plotWindow = new sf::RenderWindow{ sf::VideoMode{m_window->getSize().x / 2, m_window->getSize().y / 2}, "Graph", sf::Style::Default };
+			//m_plot = new Plotter{ m_plotWindow, &m_points };
+			m_plotWindowIsActive = true;
+		}
+	);
+
+	m_gui.add(buttonPlot);
 
 	//File Dialog
 	fileDialog = tgui::FileDialog::create();
@@ -152,9 +174,10 @@ void Application::initGUI(
 	fileDialog->setVisible(false);
 	fileDialog->setMultiSelect(false);
 
-	fileDialog->onFileSelect([&]() {
-		m_openFilePath = fileDialog->getSelectedPaths()[0].asString().toStdString();
-		inputFilePath->setText(m_openFilePath);
+	fileDialog->onFileSelect([&]()
+		{
+			m_openFilePath = fileDialog->getSelectedPaths()[0].asString().toStdString();
+			inputFilePath->setText(m_openFilePath);
 		}
 	);
 
@@ -168,9 +191,10 @@ void Application::initGUI(
 	saveFileDialog->setEnabled(false);
 	saveFileDialog->setVisible(false);
 
-	saveFileDialog->onFileSelect([&]() {
-		m_outFilePath = saveFileDialog->getSelectedPaths()[0].asString().toStdString();
-		outputFilePath->setText(m_outFilePath);
+	saveFileDialog->onFileSelect([&]()
+		{
+			m_outFilePath = saveFileDialog->getSelectedPaths()[0].asString().toStdString();
+			outputFilePath->setText(m_outFilePath);
 		}
 	);
 
@@ -224,10 +248,6 @@ void Application::masterEventHandler(tgui::Gui& gui)
 		case sf::Event::Closed:
 			m_window->close();
 			break;
-		case sf::Event::Resized:
-			m_view->setSize(static_cast<float>(m_window->getSize().x), static_cast<float>(m_window->getSize().y));
-			m_window->setView(*m_view);
-			break;
 		case sf::Event::KeyPressed:
 			switch (ev.key.code)
 			{
@@ -235,6 +255,16 @@ void Application::masterEventHandler(tgui::Gui& gui)
 				m_window->close();
 				break;
 			}
+		}
+	}
+
+	if(m_plotWindowIsActive)
+	while (m_plotWindow->pollEvent(ev))
+	{
+		if (ev.type == sf::Event::Closed)
+		{
+			m_plotWindow->close();
+			m_plotWindowIsActive = false;
 		}
 	}
 }
@@ -261,6 +291,15 @@ void Application::masterRender(sf::RenderTarget& target, tgui::Gui& gui)
 	//m_plot->render(target);
 
 	m_window->display();
+
+	if (m_plotWindowIsActive)
+	{
+		m_plotWindow->clear(sf::Color::White);
+
+		//m_plot->render(*m_plotWindow);
+
+		m_plotWindow->display();
+	}
 }
 
 void Application::displayPreview(tgui::TextArea::Ptr& previewArea)

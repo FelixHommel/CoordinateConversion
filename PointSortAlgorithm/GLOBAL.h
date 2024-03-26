@@ -2,7 +2,7 @@
 #define GLOBAL_H
 
 //Global variables
-constexpr auto DEBUG_MODE = false;
+constexpr auto DEBUG_MODE = true;
 
 //Global constants
 constexpr auto C_SCALE_FACTOR = 1.f;

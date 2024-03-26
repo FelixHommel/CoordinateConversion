@@ -17,10 +17,11 @@ public:
 private:
 	//Private members
 	sf::RenderWindow* m_window;
-	sf::View* m_view;
+	sf::RenderWindow* m_plotWindow;
 	Conversion m_converter;
-	Plotter* m_plot;
+	//Plotter* m_plot;
 
+	bool m_plotWindowIsActive{ false };
 	pointPairs m_points;
 
 	//GUI elements
@@ -32,12 +33,12 @@ private:
 	tgui::Button::Ptr m_buttonCalc;
 	tgui::Button::Ptr m_buttonSelect;
 	tgui::Button::Ptr m_buttonSave;
+	tgui::Button::Ptr m_buttonPlot;
 	tgui::FileDialog::Ptr m_fileDialog;
 	tgui::FileDialog::Ptr m_saveFileDialog;
 	tgui::Label::Ptr m_labelError;
 	tgui::TextArea::Ptr m_textAreaPreview;
 	tgui::CheckBox::Ptr m_checkPreview;
-
 
 	//private members;
 	std::string m_openFilePath;
@@ -52,6 +53,7 @@ private:
 		, tgui::Button::Ptr& buttonCalc
 		, tgui::Button::Ptr& buttonSelect
 		, tgui::Button::Ptr& buttonSave
+		, tgui::Button::Ptr& buttonPlot
 		, tgui::FileDialog::Ptr& fileDialog
 		, tgui::FileDialog::Ptr& saveFileDialog
 		, tgui::Label::Ptr& labelError
@@ -66,43 +68,6 @@ private:
 	inline float percentageSizeHeight(const sf::VideoMode& vm, const float p) { return std::floor(static_cast<float>(vm.height) * (p / 100)); }
 	inline unsigned int calculateCharSize(const sf::VideoMode& vm, const unsigned int mod) { return static_cast<unsigned int>((vm.width + vm.height) / mod); }
 
-	/*
-	const char* percentageBasedResultX(unsigned posX)
-	{
-		std::stringstream ss;
-		ss << std::to_string(percentagePosX(posX)) << "%";
-		std::string s{ ss.str() };
-		std::cout << s.c_str() << std::endl;
-		return s.c_str();
-	}
-
-	const char* percentageBasedResultY(unsigned posY)
-	{
-		std::stringstream ss;
-		ss << std::to_string(percentagePosY(posY)) << "%";
-		std::string s{ ss.str() };
-		std::cout << s.c_str() << std::endl;
-		return s.c_str();
-	}
-
-	const char* percentageBasedResultWidth(unsigned width)
-	{
-		std::stringstream ss;
-		ss << std::to_string(percentageSizeWidth(width)) << "%";
-		std::string s{ ss.str() };
-		std::cout << s.c_str() << std::endl;
-		return s.c_str();
-	}
-
-	const char* percentageBasedResultHeight(unsigned height)
-	{
-		std::stringstream ss;
-		ss << std::to_string(percentageSizeHeight(height)) << "%";
-		std::string s{ ss.str() };
-		std::cout << s.c_str() << std::endl;
-		return s.c_str();
-	}
-	*/
 	//Master functions
 	void masterEventHandler(tgui::Gui& gui);
 	void masterUpdate();
